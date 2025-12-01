@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriClaim - Mobile Crop Insurance</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS for theme and animations -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        /* Custom theme colors */
+        .bg-primary { background-color: #166534; } /* Green-800 */
+        .text-primary { color: #166534; }
+        .bg-secondary { background-color: #F0FDF4; } /* Green-50 */
+        .border-primary { border-color: #166534; }
+        .accent-primary { accent-color: #166534; }
+        
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Styling for the claim tracker */
+        .step {
+            transition: all 0.3s ease;
+        }
+        .step.active .step-circle {
+            background-color: #16a34a; /* Green-600 */
+            border-color: #16a34a;
+            color: white;
+        }
+        .step.active .step-title {
+            color: #15803d; /* Green-700 */
+            font-weight: 600;
+        }
+        .step-line {
+            transition: background-color 0.5s ease;
+        }
+        .step.active .step-line {
+            background-color: #16a34a;
+        }
+
+        /* Spinner for loading simulation */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #166534;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <main class="min-h-screen flex flex-col items-center justify-center container mx-auto p-4">
+
+        <!-- Landing View (Visible by default) -->
+        <section id="landing-view" class="w-full text-center fade-in">
+            
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 leading-tight">
+                Faster Crop Insurance, <span class="text-primary">Faster Farmer Relief.</span>
+            </h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                The easiest way to file and track your crop insurance claims. Get started below.
+            </p>
+            <div class="mt-8 flex justify-center">
+                <button id="get-started-btn" class="bg-primary text-white font-bold px-12 py-4 rounded-lg text-xl hover:bg-green-800 transition-transform hover:scale-105 shadow-lg">Get Started</button>
+            </div>
+        </section>
+
+        <!-- Dashboard View (Hidden by default) -->
+        <section id="dashboard-view" class="hidden w-full max-w-4xl fade-in">
+            <!-- Dashboard Header -->
+            <header class="flex justify-between items-center mb-8">
+                 <h1 class="text-3xl font-bold text-primary flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    AgriClaim
+                </h1>
+                <div id="profile-section" class="text-right">
+                    <h2 class="font-semibold text-lg">Your Profile</h2>
+                    <p class="text-sm text-gray-600">Ram Kumar | ID: 987654</p>
+                </div>
+            </header>
+
+            <!-- Dashboard Content Area -->
+            <div id="dashboard-content" class="bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-gray-200 min-h-[50vh]">
+                <!-- Dynamic content will be rendered here -->
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- View Management ---
+            const landingView = document.getElementById('landing-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            const dashboardContent = document.getElementById('dashboard-content');
+            const getStartedBtn = document.getElementById('get-started-btn');
+
+            getStartedBtn.addEventListener('click', () => {
+                landingView.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                renderDashboardHome();
+            });
+
+            // --- RENDER FUNCTIONS ---
+            
+            function renderDashboardHome() {
+                dashboardContent.innerHTML = `
+                    <div id="dashboard-home" class="fade-in">
+                        <h3 class="text-2xl font-bold text-center mb-8">Welcome, Ram Kumar!</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                            <!-- 1. New Claim Card -->
+                            <div id="new-claim-btn" class="bg-secondary p-6 rounded-xl border-2 border-dashed border-gray-300 text-center hover:border-primary hover:bg-green-100 cursor-pointer transition">
+                                <div class="bg-primary text-white rounded-full h-16 w-16 flex items-center justify-center mx-auto"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg></div>
+                                <h4 class="mt-4 text-xl font-semibold">New Claim</h4>
+                                <p class="mt-1 text-gray-600">Start a new crop loss claim.</p>
+                            </div>
+                            
+                            <!-- 2. Verification Status Card -->
+                            <div id="verification-status-btn" class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm text-center hover:shadow-lg hover:border-primary cursor-pointer transition">
+                                <div class="bg-yellow-100 text-yellow-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                <h4 class="mt-4 text-xl font-semibold">Verification Status</h4>
+                                <p class="mt-1 text-gray-600">Track claims under review.</p>
+                            </div>
+
+                            <!-- 3. Approved Requests Card -->
+                             <div id="approved-requests-btn" class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm text-center hover:shadow-lg hover:border-primary cursor-pointer transition">
+                                <div class="bg-green-100 text-green-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                <h4 class="mt-4 text-xl font-semibold">Approved Requests</h4>
+                                <p class="mt-1 text-gray-600">View approved claims and payouts.</p>
+                            </div>
+
+                            <!-- 4. Claim History Card -->
+                            <div id="claim-history-btn" class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm text-center hover:shadow-lg hover:border-primary cursor-pointer transition">
+                                <div class="bg-blue-100 text-blue-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg></div>
+                                <h4 class="mt-4 text-xl font-semibold">Claim History</h4>
+                                <p class="mt-1 text-gray-600">See a full list of all your claims.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('new-claim-btn').addEventListener('click', () => renderClaimForm(1));
+                document.getElementById('verification-status-btn').addEventListener('click', renderVerificationStatus);
+                document.getElementById('approved-requests-btn').addEventListener('click', renderApprovedRequests);
+                document.getElementById('claim-history-btn').addEventListener('click', renderClaimHistory);
+            }
+
+            // --- Claim Form Logic ---
+            let currentStep = 1;
+            const totalSteps = 6;
+            let formData = {};
+
+            function renderClaimForm(step) {
+                currentStep = step;
+                dashboardContent.innerHTML = `
+                    <div id="claim-form-view" class="fade-in">
+                        <div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-bold">New Claim</h3><span class="text-sm font-semibold text-gray-500">Step ${currentStep} of ${totalSteps}</span></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-8"><div class="bg-primary h-2 rounded-full transition-all duration-500" style="width: ${(currentStep / totalSteps) * 100}%"></div></div>
+                        <div id="form-step-content" class="min-h-[250px]"></div>
+                    </div>
+                `;
+                renderFormStepContent(currentStep);
+            }
+
+            function renderFormStepContent(step) {
+                const contentEl = document.getElementById('form-step-content');
+                let html = '';
+                switch (step) {
+                    case 1: // Personal Details
+                        html = `<h4 class="text-xl font-semibold mb-4">1. Personal Details</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label for="fullName" class="block text-sm font-medium">Full Name</label><input type="text" id="fullName" value="${formData.fullName || 'Ram Kumar'}" class="mt-1 w-full input-field"></div>
+                            <div><label for="fatherName" class="block text-sm font-medium">Father's Name</label><input type="text" id="fatherName" value="${formData.fatherName || ''}" class="mt-1 w-full input-field"></div>
+                            <div><label for="mobileNumber" class="block text-sm font-medium">Mobile Number</label><input type="tel" id="mobileNumber" value="${formData.mobileNumber || ''}" class="mt-1 w-full input-field"></div>
+                            <div><label for="aadhaarNumber" class="block text-sm font-medium">Aadhaar Number</label><input type="text" id="aadhaarNumber" maxlength="12" pattern="[0-9]{12}" value="${formData.aadhaarNumber || ''}" class="mt-1 w-full input-field"></div>
+                            <div><label for="panNumber" class="block text-sm font-medium">PAN Card Number</label><input type="text" id="panNumber" maxlength="10" value="${formData.panNumber || ''}" class="mt-1 w-full input-field uppercase"></div>
+                            <div class="md:col-span-2"><label for="fullAddress" class="block text-sm font-medium">Full Address</label><textarea id="fullAddress" rows="2" class="mt-1 w-full input-field">${formData.fullAddress || ''}</textarea></div>
+                        </div>
+                        <div class="mt-8 flex justify-between"><button class="back-to-dash text-gray-600 hover:text-primary">&larr; Dashboard</button><button class="form-nav-btn btn-primary" data-direction="next">Next &rarr;</button></div>`;
+                        break;
+                    case 2: // Crop Loss Details
+                        html = `<h4 class="text-xl font-semibold mb-4">2. Crop Loss Details</h4><div class="space-y-4"><div><label for="cropType" class="block text-sm font-medium">Crop Type</label><select id="cropType" class="mt-1 w-full input-field"><option>Wheat</option><option>Rice</option><option>Cotton</option></select></div><div><label for="lossDate" class="block text-sm font-medium">Date of Loss</label><input type="date" id="lossDate" value="${formData.lossDate || ''}" class="mt-1 w-full input-field"></div></div><div class="mt-8 flex justify-between"><button class="form-nav-btn" data-direction="prev">&larr; Back</button><button class="form-nav-btn btn-primary" data-direction="next">Next &rarr;</button></div>`;
+                        break;
+                    case 3: // Live Video Verification
+                        html = `<h4 class="text-xl font-semibold mb-4">3. Live Video Verification</h4><div id="video-verification-box" class="text-center p-6 border-2 border-dashed rounded-lg flex flex-col items-center justify-center min-h-[150px]"><p class="text-gray-600 mb-4">Our system requires a live video feed to assess the damage.</p><button id="start-video-btn" class="btn-primary">Start Live Verification</button></div><div class="mt-8 flex justify-between"><button class="form-nav-btn" data-direction="prev">&larr; Back</button><button id="video-next-btn" class="form-nav-btn btn-primary" data-direction="next" disabled>Next &rarr;</button></div>`;
+                        break;
+                    case 4: // Satellite Verification
+                        html = `<h4 class="text-xl font-semibold mb-4">4. Satellite Verification</h4><div id="satellite-verification-box" class="text-center p-6 border-2 border-dashed rounded-lg flex flex-col items-center justify-center min-h-[150px]"><div class="spinner"></div><p class="text-gray-600 mt-4">Analyzing satellite imagery for your location:<br><strong>Talegaon Dabhade, Maharashtra</strong></p></div><div class="mt-8 flex justify-between"><button class="form-nav-btn" data-direction="prev">&larr; Back</button><button class="form-nav-btn btn-primary" data-direction="next">Next &rarr;</button></div>`;
+                        // Simulate satellite check
+                        setTimeout(() => {
+                            const satelliteBox = document.getElementById('satellite-verification-box');
+                            if (satelliteBox) {
+                                satelliteBox.innerHTML = `<div class="flex items-center text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><h5 class="font-semibold">Analysis Complete</h5></div><p class="text-sm text-gray-600 mt-2">Date: 14 Sep 2025. Result: Significant crop damage detected, consistent with your claim.</p>`;
+                            }
+                        }, 2500);
+                        break;
+                    case 5: // Bank Details
+                        html = `<h4 class="text-xl font-semibold mb-4">5. Bank Details</h4><div class="space-y-4"><div><label for="bankName" class="block text-sm font-medium">Bank Name</label><input type="text" id="bankName" value="${formData.bankName || ''}" class="mt-1 w-full input-field"></div><div><label for="accountNumber" class="block text-sm font-medium">Account Number</label><input type="text" id="accountNumber" value="${formData.accountNumber || ''}" class="mt-1 w-full input-field"></div></div><div class="mt-8 flex justify-between"><button class="form-nav-btn" data-direction="prev">&larr; Back</button><button class="form-nav-btn btn-primary" data-direction="next">Review &rarr;</button></div>`;
+                        break;
+                    case 6: // Review
+                        html = `<h4 class="text-xl font-semibold mb-4">6. Review and Submit</h4><div class="bg-secondary p-4 rounded-lg space-y-3 text-sm">
+                            <div class="flex justify-between"><span class="font-medium text-gray-600">Name:</span><span class="font-semibold">${formData.fullName}</span></div>
+                            <div class="flex justify-between"><span class="font-medium text-gray-600">Aadhaar:</span><span class="font-semibold">${'********' + formData.aadhaarNumber.slice(-4)}</span></div>
+                            <div class="flex justify-between"><span class="font-medium text-gray-600">PAN:</span><span class="font-semibold">${formData.panNumber}</span></div>
+                            <hr class="my-2">
+                            <div class="flex justify-between"><span class="font-medium text-gray-600">Crop:</span><span class="font-semibold">${formData.cropType}</span></div>
+                            <div class="flex items-center justify-between text-green-700"><span class="font-medium">Live Video:</span><span class="font-semibold">✓ Verified</span></div>
+                            <div class="flex items-center justify-between text-green-700"><span class="font-medium">Satellite Data:</span><span class="font-semibold">✓ Verified</span></div>
+                            <hr class="my-2">
+                            <div class="flex justify-between"><span class="font-medium text-gray-600">Bank:</span><span class="font-semibold">${formData.bankName}</span></div>
+                        </div><div class="mt-4 flex items-start"><input id="consent" type="checkbox" class="h-4 w-4 accent-primary mt-1"><label for="consent" class="ml-2 block text-sm">I declare the information is true.</label></div><div class="mt-8 flex justify-between"><button class="form-nav-btn" data-direction="prev">&larr; Back</button><button id="submit-claim-btn" class="btn-primary disabled:bg-gray-400" disabled>Submit Claim</button></div>`;
+                        break;
+                }
+                contentEl.innerHTML = html.replaceAll('input-field', 'px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary').replaceAll('btn-primary', 'bg-primary text-white font-bold py-2 px-6 rounded-lg hover:bg-green-800');
+                
+                if (step === 3) {
+                    document.getElementById('start-video-btn').addEventListener('click', simulateVideoVerification);
+                }
+                if (step === 6) {
+                    document.getElementById('consent').addEventListener('change', (e) => {
+                        document.getElementById('submit-claim-btn').disabled = !e.target.checked;
+                    });
+                }
+            }
+
+            function simulateVideoVerification() {
+                const videoBox = document.getElementById('video-verification-box');
+                videoBox.innerHTML = `<div class="w-full bg-black rounded-md p-4 text-white text-left text-sm min-h-[100px]"><span class="text-red-500 font-bold">● REC</span><p class="mt-2">Simulating live camera feed...<br>Please hold steady.</p></div><p class="text-gray-600 mt-4">Verification in progress...</p>`;
+                
+                setTimeout(() => {
+                    videoBox.innerHTML = `<div class="flex items-center text-green-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><h5 class="text-xl font-semibold">Live Verification Successful</h5></div>`;
+                    document.getElementById('video-next-btn').disabled = false;
+                }, 3000);
+            }
+
+            function saveStepData(step) {
+                 switch (step) {
+                    case 1: 
+                        formData.fullName = document.getElementById('fullName').value; 
+                        formData.fatherName = document.getElementById('fatherName').value;
+                        formData.mobileNumber = document.getElementById('mobileNumber').value; 
+                        formData.aadhaarNumber = document.getElementById('aadhaarNumber').value;
+                        formData.panNumber = document.getElementById('panNumber').value;
+                        formData.fullAddress = document.getElementById('fullAddress').value;
+                        break;
+                    case 2: 
+                        formData.cropType = document.getElementById('cropType').value; 
+                        formData.lossDate = document.getElementById('lossDate').value; 
+                        break;
+                    case 5: 
+                        formData.bankName = document.getElementById('bankName').value; 
+                        formData.accountNumber = document.getElementById('accountNumber').value; 
+                        break;
+                }
+            }
+            
+            // --- Event Listener for Dashboard Content ---
+            dashboardContent.addEventListener('click', (e) => {
+                if (e.target.closest('.form-nav-btn')) {
+                    const direction = e.target.closest('.form-nav-btn').dataset.direction;
+                    if (direction === 'next') {
+                        saveStepData(currentStep);
+                        if (currentStep < totalSteps) renderClaimForm(currentStep + 1);
+                    } else if (direction === 'prev') {
+                        if (currentStep > 1) renderClaimForm(currentStep - 1);
+                    }
+                }
+                if (e.target.closest('#submit-claim-btn')) renderSuccessView();
+                if (e.target.closest('.back-to-dash')) renderDashboardHome();
+            });
+            
+            function renderSuccessView() {
+                const claimId = `AC-${Math.floor(10000000 + Math.random() * 90000000)}`;
+                dashboardContent.innerHTML = `<div class="fade-in text-center py-10"><div class="bg-green-100 text-primary rounded-full h-20 w-20 flex items-center justify-center mx-auto"><svg class="h-12 w-12" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg></div><h2 class="mt-6 text-3xl font-bold">Claim Submitted!</h2><p class="mt-2 text-lg text-gray-600">Your claim ID is <strong class="font-mono bg-gray-100 p-1 rounded">${claimId}</strong>.</p><div class="mt-8"><button class="back-to-dash text-primary font-semibold"> &larr; Back to Dashboard</button></div></div>`;
+                formData = {}; // Reset form data
+            }
+
+            function renderVerificationStatus() {
+                dashboardContent.innerHTML = `
+                    <div class="fade-in"><div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-bold">Verification Status</h3><button class="back-to-dash text-gray-600 hover:text-primary text-sm font-semibold">&larr; Dashboard</button></div><div class="space-y-4">
+                        <div class="bg-secondary p-4 rounded-lg border border-gray-200 cursor-pointer hover:border-primary" onclick="renderClaimStatus('Verification Status', 'AC-12345678', 2)">
+                            <div class="flex justify-between items-center"><div><p class="font-bold">ID: AC-12345678</p><p class="text-sm text-gray-600">Crop: Cotton | Filed: 14 Sep 2025</p></div><span class="bg-yellow-200 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Verifying</span></div>
+                        </div>
+                    </div></div>
+                `;
+            }
+
+            function renderApprovedRequests() {
+                 dashboardContent.innerHTML = `
+                    <div class="fade-in"><div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-bold">Approved Requests</h3><button class="back-to-dash text-gray-600 hover:text-primary text-sm font-semibold">&larr; Dashboard</button></div><div class="space-y-4">
+                        <div class="bg-secondary p-4 rounded-lg border border-gray-200 cursor-pointer hover:border-primary" onclick="renderClaimStatus('Approved Request Status', 'AC-87654321', 4)">
+                            <div class="flex justify-between items-center"><div><p class="font-bold">ID: AC-87654321</p><p class="text-sm text-gray-600">Crop: Rice | Approved: 01 Sep 2025</p></div><span class="bg-green-200 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Paid</span></div>
+                        </div>
+                    </div></div>
+                `;
+            }
+            
+            function renderClaimHistory() {
+                 dashboardContent.innerHTML = `
+                    <div class="fade-in"><div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-bold">Claim History</h3><button class="back-to-dash text-gray-600 hover:text-primary text-sm font-semibold">&larr; Dashboard</button></div><div class="space-y-4">
+                        <div class="bg-secondary p-4 rounded-lg border cursor-pointer" onclick="renderClaimStatus('Claim Status', 'AC-12345678', 2)"><div class="flex justify-between"><div><strong>ID: AC-12345678</strong></div><span class="bg-yellow-200 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Verifying</span></div></div>
+                        <div class="bg-secondary p-4 rounded-lg border cursor-pointer" onclick="renderClaimStatus('Claim Status', 'AC-87654321', 4)"><div class="flex justify-between"><div><strong>ID: AC-87654321</strong></div><span class="bg-green-200 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Paid</span></div></div>
+                        <div class="bg-secondary p-4 rounded-lg border"><div class="flex justify-between"><div><strong>ID: AC-55554444</strong></div><span class="bg-red-200 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Rejected</span></div></div>
+                    </div></div>
+                `;
+            }
+
+            window.renderClaimStatus = function(title, claimId, activeStep) {
+                 dashboardContent.innerHTML = `
+                    <div class="fade-in"><div class="flex justify-between items-center mb-6"><div><h3 class="text-2xl font-bold">${title}</h3><p class="text-gray-600">Tracking ID: ${claimId}</p></div><button class="back-to-dash text-gray-600 hover:text-primary text-sm font-semibold">&larr; Dashboard</button></div>
+                    <div class="flex flex-col space-y-2 mt-4">
+                        ${[
+                            {title: "Claim Filed", desc: "Your claim was successfully submitted."},
+                            {title: "Verification in Progress", desc: "Live & satellite data analysis is underway."},
+                            {title: "Claim Approved", desc: "Your claim has been approved for payout."},
+                            {title: "Payout Transferred", desc: "Amount sent to your bank account."}
+                        ].map((step, index) => `<div class="step flex items-start ${index < activeStep ? 'active' : ''}"><div class="flex flex-col items-center mr-4"><div class="step-circle h-8 w-8 rounded-full flex items-center justify-center font-bold border-2">${index + 1}</div>${index < 3 ? '<div class="step-line h-16 w-0.5"></div>' : ''}</div><div><h4 class="step-title font-medium">${step.title}</h4><p class="text-sm text-gray-500">${step.desc}</p></div></div>`).join('').replaceAll('step-circle', 'step-circle bg-gray-300 text-gray-500 border-gray-300').replaceAll('step-line', 'step-line bg-gray-300').replaceAll('step-title', 'step-title text-gray-500')}
+                    </div></div>`;
+            }
+        });
+    </script>
+</body>
+</html>
+
